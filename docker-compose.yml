@@ -1,0 +1,36 @@
+version: '3.9'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      DB_HOST: db
+    depends_on:
+      - db
+    volumes:
+      - .:/var/www/html
+    networks:
+      - vacation_net
+
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db:/docker-entrypoint-initdb.d
+    networks:
+      - vacation_net
+
+networks:
+  vacation_net:
+
+volumes:
+  pgdata:
