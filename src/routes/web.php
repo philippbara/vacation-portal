@@ -1,11 +1,7 @@
 <?php
-
-// This file is loaded inside the FastRoute callback where $r is the RouteCollector.
-// Add simple routes here for testing and later replace with controller handlers.
-
 $r->addRoute('GET', '/', function () {
-    header('Content-Type: text/html; charset=utf-8');
-    echo '<h1>Vacation Portal</h1><p>Welcome — app running.</p>';
+    header('Location: /dashboard', true, 302);
+    exit();
 });
 
 $r->addRoute('GET', '/login', function () {

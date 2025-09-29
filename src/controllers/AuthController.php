@@ -48,12 +48,10 @@ class AuthController
 
     public static function logout()
     {
-        // Clear all session data
         $_SESSION = [];
         session_destroy();
 
-        // Redirect with message
-        session_start(); // restart to set flash after destroy
+        session_start(); 
         $_SESSION['flash_messages'][] = [
             'text' => "You have been logged out.",
             'type' => 'success'
