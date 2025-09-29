@@ -35,4 +35,11 @@ class User
         $stmt->execute([$id]);
         return $stmt->fetch();
     }
+
+    public static function delete(int $id)
+    {
+        $pdo = get_db();
+        $stmt = $pdo->prepare("DELETE FROM users WHERE id = ?");
+        $stmt->execute([$id]);
+    }
 }

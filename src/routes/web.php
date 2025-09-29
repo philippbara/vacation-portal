@@ -248,3 +248,17 @@ $r->addRoute('POST', '/users/create', function () {
     require_once __DIR__ . '/../controllers/UserController.php';
     \App\Controllers\UserController::create();
 });
+
+// Handle form submission
+$r->addRoute('POST', '/users/delete/{id:\d+}', function ($args) {
+    require_once __DIR__ . '/../helpers/auth.php';
+    requireRole('manager');
+
+    require_once __DIR__ . '/../models/User.php';
+    \App\Models\User::delete($args['id']);
+    $_SESSION['flash_messages'][] = [
+        'text' => "User deleted successfully.",
+        'type' => 'success'
+    ];
+    exit;
+});

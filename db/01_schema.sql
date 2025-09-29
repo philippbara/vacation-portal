@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS users (
     last_name VARCHAR(50),
     email VARCHAR(50),
     password_hash TEXT NOT NULL,
-    employee_code, CHAR(7) UNIQUE,
+    employee_code CHAR(7) UNIQUE,
     role VARCHAR(20) DEFAULT 'employee',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

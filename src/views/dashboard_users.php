@@ -28,6 +28,7 @@ $usersJson = json_encode($users ?? []); // passed from PHP
                 <th>Name</th>
                 <th>Email</th>
                 <th>Total Vacation Requests</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -50,6 +51,14 @@ $usersJson = json_encode($users ?? []); // passed from PHP
                 <td>{{ user.first_name }} {{ user.last_name }}</td>
                 <td>{{ user.email }}</td>
                 <td>{{ user.total_vacations }}</td>
+                <td>
+                    <button 
+                        @click.stop="deleteUser(user.id)" 
+                        class="dashboard-btn danger"
+                    >
+                        Delete
+                    </button>
+                </td>
             </tr>
         </tbody>
     </table>
@@ -84,6 +93,18 @@ createApp({
     methods: {
         goToUser(userId) {
             window.location.href = '/users/' + userId;
+        },
+        deleteUser(userId) {
+            if (!confirm("Are you sure you want to delete this user?")) return;
+
+            fetch(`/users/delete/${userId}`, { 
+                method: 'POST' 
+            })
+            .then(res => {
+                if (!res.ok) return alert(`Failed to ${action} request`);
+                location.reload(); // always reload, no need for newStatus
+            })
+            .catch(() => alert(`Failed to ${action} request`));
         }
     }
 }).mount('#dashboard-app');
