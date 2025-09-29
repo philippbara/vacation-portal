@@ -1,7 +1,7 @@
 <header style="display:flex; justify-content:space-between; align-items:center; padding:10px; background:#eee;">
     <h1><?= htmlspecialchars($pageTitle ?? 'Vacation Portal') ?></h1>
 
-    <?php if (!empty($_SESSION['user'])): ?>
+    <?php if (!empty($_SESSION['user'])) : ?>
     <div style="position:relative; display:inline-block;">
         <!-- Profile Button -->
         <button id="profileBtn" style="background:none; border:none; cursor:pointer;">

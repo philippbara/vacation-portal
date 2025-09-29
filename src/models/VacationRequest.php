@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 require_once __DIR__ . '/../../config/bootstrap.php';
@@ -49,7 +50,7 @@ class VacationRequest
         $stmt = $pdo->prepare("DELETE FROM vacation_requests WHERE id = ?");
         $stmt->execute([$request_id]);
     }
-    
+
     public static function updateStatus(int $request_id, string $status)
     {
         $pdo = get_db();

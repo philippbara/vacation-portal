@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controllers;
 
 require_once __DIR__ . '/../../config/bootstrap.php';
@@ -35,7 +36,7 @@ class AuthController
             } else {
                 $_SESSION['flash_messages'][] = [
                     'text' => "Invalid username or password.",
-                    'type' => 'error' 
+                    'type' => 'error'
                 ];
                 header('Location: /login');
                 exit();
@@ -55,7 +56,7 @@ class AuthController
         session_start(); // restart to set flash after destroy
         $_SESSION['flash_messages'][] = [
             'text' => "You have been logged out.",
-            'type' => 'success' 
+            'type' => 'success'
         ];
         header('Location: /login');
         exit;

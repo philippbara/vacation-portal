@@ -1,4 +1,5 @@
 <?php
+
 // This file is loaded inside the FastRoute callback where $r is the RouteCollector.
 // Add simple routes here for testing and later replace with controller handlers.
 
@@ -23,7 +24,7 @@ $r->addRoute('GET', '/logout', function () {
 
 $r->addRoute('GET', '/dashboard', function () {
     require_once __DIR__ . '/../helpers/auth.php';
-    requireLogin(); 
+    requireLogin();
 
     require __DIR__ . '/../controllers/AuthController.php';
     \App\Controllers\AuthController::dashboard();
@@ -44,7 +45,7 @@ $r->addRoute('GET', '/users/{id:\d+}', function ($args) {
     if ($role === 'employee' && $requested_user_id !== $current_user['id']) {
         $_SESSION['flash_messages'][] = [
             'text' => "⚠️ You cannot view other users' vacation requests.",
-            'type' => 'info' 
+            'type' => 'info'
         ];
         header('Location: /dashboard');
         exit;
@@ -55,14 +56,14 @@ $r->addRoute('GET', '/users/{id:\d+}', function ($args) {
     if (!$user) {
         $_SESSION['flash_messages'][] = [
             'text' => "User not found",
-            'type' => 'error' 
+            'type' => 'error'
         ];
         header('Location: /dashboard');
         exit;
     }
 
     // Fetch vacation requests
-    $requests = ($role === 'employee') 
+    $requests = ($role === 'employee')
         ? \App\Models\VacationRequest::byUser($current_user['id'])
         : \App\Models\VacationRequest::byUser($requested_user_id);
 
@@ -81,7 +82,7 @@ $r->addRoute('GET', '/users/{id:\d+}/new', function ($args) {
     if ($current_user['role'] === 'employee' && $current_user['id'] !== $requested_user_id) {
         $_SESSION['flash_messages'][] = [
             'text' => "⚠️ You cannot create requests for other users.",
-            'type' => 'info' 
+            'type' => 'info'
         ];
         header('Location: /dashboard');
         exit;
@@ -92,7 +93,7 @@ $r->addRoute('GET', '/users/{id:\d+}/new', function ($args) {
     if (!$user) {
         $_SESSION['flash_messages'][] = [
             'text' => "User not found",
-            'type' => 'error' 
+            'type' => 'error'
         ];
         header('Location: /dashboard');
         exit;
@@ -112,7 +113,7 @@ $r->addRoute('POST', '/users/{id:\d+}/new', function ($args) {
     if ($current_user['role'] === 'employee' && $current_user['id'] !== $requested_user_id) {
         $_SESSION['flash_messages'][] = [
             'text' => "⚠️ You cannot create requests for other users.",
-            'type' => 'info' 
+            'type' => 'info'
         ];
         header('Location: /dashboard');
         exit;
@@ -128,15 +129,15 @@ $r->addRoute('POST', '/users/{id:\d+}/new', function ($args) {
     if (empty($start_date) || empty($end_date)) {
         $_SESSION['flash_messages'][] = [
             'text' => "Start and end dates are required.",
-            'type' => 'info' 
+            'type' => 'info'
         ];
         header("Location: /users/{$requested_user_id}/new");
         exit;
     }
-    if (empty($reason)){
+    if (empty($reason)) {
         $_SESSION['flash_messages'][] = [
             'text' => "Vacation reason is required.",
-            'type' => 'info' 
+            'type' => 'info'
         ];
         header("Location: /users/{$requested_user_id}/new");
         exit;
@@ -151,7 +152,7 @@ $r->addRoute('POST', '/users/{id:\d+}/new', function ($args) {
     if ($start_ts > $end_ts) {
         $_SESSION['flash_messages'][] = [
             'text' => "⚠️ End date must be after or equal to start date.",
-            'type' => 'info' 
+            'type' => 'info'
         ];
         header("Location: /users/{$requested_user_id}/new");
         exit;
@@ -161,7 +162,7 @@ $r->addRoute('POST', '/users/{id:\d+}/new', function ($args) {
     if ($start_ts <= $today_ts || $end_ts <= $today_ts) {
         $_SESSION['flash_messages'][] = [
             'text' => "⚠️ Both start and end dates must be in the future.",
-            'type' => 'info' 
+            'type' => 'info'
         ];
         header("Location: /users/{$requested_user_id}/new");
         exit;
@@ -171,7 +172,7 @@ $r->addRoute('POST', '/users/{id:\d+}/new', function ($args) {
 
     $_SESSION['flash_messages'][] = [
         'text' => "Vacation request submitted successfully.",
-        'type' => 'success' 
+        'type' => 'success'
     ];
     header("Location: /users/{$requested_user_id}");
     exit;
@@ -189,13 +190,13 @@ $r->addRoute('POST', '/users/{user_id:\d+}/{request_id:\d+}/delete', function ($
     \App\Models\VacationRequest::delete($args['request_id']);
     $_SESSION['flash_messages'][] = [
         'text' => "Vacation request deleted successfully.",
-        'type' => 'success' 
+        'type' => 'success'
     ];
     exit;
 });
 
 // Approve vacation request
-$r->addRoute('POST', '/users/{user_id:\d+}/{request_id:\d+}/approve', function($args) {
+$r->addRoute('POST', '/users/{user_id:\d+}/{request_id:\d+}/approve', function ($args) {
     require_once __DIR__ . '/../helpers/auth.php';
     requireRole('manager');
 
@@ -208,13 +209,13 @@ $r->addRoute('POST', '/users/{user_id:\d+}/{request_id:\d+}/approve', function($
     \App\Models\VacationRequest::updateStatus($args['request_id'], 'approved');
     $_SESSION['flash_messages'][] = [
         'text' => "Vacation request approved.",
-        'type' => 'success' 
+        'type' => 'success'
     ];
     exit;
 });
 
 // Reject vacation request
-$r->addRoute('POST', '/users/{user_id:\d+}/{request_id:\d+}/reject', function($args) {
+$r->addRoute('POST', '/users/{user_id:\d+}/{request_id:\d+}/reject', function ($args) {
     require_once __DIR__ . '/../helpers/auth.php';
     requireRole('manager');
 
@@ -226,7 +227,7 @@ $r->addRoute('POST', '/users/{user_id:\d+}/{request_id:\d+}/reject', function($a
     \App\Models\VacationRequest::updateStatus($args['request_id'], 'rejected');
     $_SESSION['flash_messages'][] = [
         'text' => "Vacation request rejected.",
-        'type' => 'success' 
+        'type' => 'success'
     ];
     exit;
 });

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controllers;
 
 require_once __DIR__ . '/../../config/bootstrap.php';
@@ -23,7 +24,7 @@ class UserController
             $role = $_POST['role'];
 
             // Basic empty field validation
-            if (!$username || !$password || !$email || !$employee_code ) {
+            if (!$username || !$password || !$email || !$employee_code) {
                 header('Location: /users/create');
                 exit;
             }
@@ -33,7 +34,7 @@ class UserController
                 exit;
             }
 
-            $pdo = get_db();            
+            $pdo = get_db();
 
             // Check if username already exists
             $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE username = ?");
@@ -43,7 +44,7 @@ class UserController
             if ($exists) {
                 $_SESSION['flash_messages'][] = [
                     'text' => "Username '{$username}' is already taken.",
-                    'type' => 'error' 
+                    'type' => 'error'
                 ];
                 header('Location: /users/create');
                 exit;
@@ -55,7 +56,7 @@ class UserController
             if ($stmt->fetchColumn() > 0) {
                 $_SESSION['flash_messages'][] = [
                     'text' => "Email '{$email}' is already taken.",
-                    'type' => 'error' 
+                    'type' => 'error'
                 ];
                 header('Location: /users/create');
                 exit;
@@ -67,7 +68,7 @@ class UserController
             if ($stmt->fetchColumn() > 0) {
                 $_SESSION['flash_messages'][] = [
                     'text' => "Employer code '{$employee_code}' is already taken.",
-                    'type' => 'error' 
+                    'type' => 'error'
                 ];
                 header('Location: /users/create');
                 exit;
@@ -76,7 +77,7 @@ class UserController
             if (!preg_match("/^\d{7}$/", $employee_code)) {
                 $_SESSION['flash_messages'][] = [
                     'text' => "Employer code '{$employee_code}' must be 7 digits.",
-                    'type' => 'error' 
+                    'type' => 'error'
                 ];
                 header('Location: /users/create');
                 exit;

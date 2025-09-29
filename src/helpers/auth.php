@@ -1,10 +1,12 @@
 <?php
-function requireLogin() {
+
+function requireLogin()
+{
     if (!isset($_SESSION['user'])) {
         // Save message for next request
         $_SESSION['flash_messages'][] = [
             'text' => "Please log in to access this page.",
-            'type' => 'info' 
+            'type' => 'info'
         ];
 
         // Save current URL to return to after login
@@ -16,13 +18,14 @@ function requireLogin() {
     }
 }
 
-function requireRole($role) {
+function requireRole($role)
+{
     requireLogin(); // always ensure logged in first
 
     if ($_SESSION['user']['role'] !== $role) {
         $_SESSION['flash_messages'][] = [
             'text' => "You do not have permission to access that page.",
-            'type' => 'info' 
+            'type' => 'info'
         ];
         header('Location: /dashboard');
         exit();

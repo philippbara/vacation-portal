@@ -1,6 +1,6 @@
-<?php if (!empty($_SESSION['flash_messages'])): ?>
+<?php if (!empty($_SESSION['flash_messages'])) : ?>
     <div id="flashContainer">
-        <?php foreach ($_SESSION['flash_messages'] as $msg): ?>
+        <?php foreach ($_SESSION['flash_messages'] as $msg) : ?>
             <div class="toast <?= htmlspecialchars($msg['type'] ?? 'info') ?>">
                 <span><?= htmlspecialchars($msg['text']) ?></span>
                 <button class="closeBtn">&times;</button>

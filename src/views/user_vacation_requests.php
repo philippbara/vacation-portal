@@ -10,7 +10,7 @@ $pageTitle = "Vacation Requests for " . htmlspecialchars($user['username']);
 
 <div id="vacation-requests-app" class="page-container">
 
-    <?php if ($current_user['id'] === $user['id']): ?>
+    <?php if ($current_user['id'] === $user['id']) : ?>
         <div class="table-controls">            
             <a href="/users/<?= $user['id'] ?>/new">
                 <button type="button" class="dashboard-btn">+ New Vacation Request</button>
@@ -60,7 +60,7 @@ $pageTitle = "Vacation Requests for " . htmlspecialchars($user['username']);
         </tbody>
     </table>
 
-    <?php if (in_array($current_user['role'], ['manager', 'admin'])): ?>
+    <?php if (in_array($current_user['role'], ['manager', 'admin'])) : ?>
         <div class="flex-links">
             <a href="/dashboard">
                 <button class="dashboard-btn">Back to Dashboard</button>
