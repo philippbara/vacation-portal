@@ -249,6 +249,27 @@ $r->addRoute('POST', '/users/create', function () {
     \App\Controllers\UserController::create();
 });
 
+$r->addRoute('GET', '/users/edit/{id:\d+}', function ($args) {
+    require_once __DIR__ . '/../helpers/auth.php';
+    requireRole('manager');
+
+    require_once __DIR__ . '/../controllers/UserController.php';
+    \App\Controllers\UserController::editForm($args['id']);
+});
+
+// Handle form submission
+$r->addRoute('POST', '/users/edit/{id:\d+}', function ($args) {
+    require_once __DIR__ . '/../helpers/auth.php';
+    requireRole('manager');
+
+    require_once __DIR__ . '/../controllers/UserController.php';
+    \App\Controllers\UserController::edit($args['id']);
+    $_SESSION['flash_messages'][] = [
+        'text' => "User edited successfully.",
+        'type' => 'success'
+    ];
+});
+
 // Handle form submission
 $r->addRoute('POST', '/users/delete/{id:\d+}', function ($args) {
     require_once __DIR__ . '/../helpers/auth.php';

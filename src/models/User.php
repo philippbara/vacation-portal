@@ -9,6 +9,7 @@ class User
     public static function allEmployeesWithVacationCount()
     {
         $pdo = get_db();
+        // Sort by employer who has the closest vacation request to today
         $stmt = $pdo->query("
             SELECT 
                 u.id, 
@@ -18,12 +19,13 @@ class User
                 u.last_name, 
                 u.email,
                 COUNT(vr.id) AS total_vacations,
-                COUNT(CASE WHEN vr.status = 'pending' THEN 1 END) AS pending_requests
+                COUNT(CASE WHEN vr.status = 'pending' THEN 1 END) AS pending_requests,
+                MIN(CASE WHEN vr.start_date >= CURRENT_DATE THEN vr.start_date END) AS next_vacation
             FROM users u
             LEFT JOIN vacation_requests vr ON u.id = vr.user_id
             WHERE u.role = 'employee'
             GROUP BY u.id
-            ORDER BY u.username
+            ORDER BY next_vacation ASC NULLS LAST;
         ");
         return $stmt->fetchAll();
     }

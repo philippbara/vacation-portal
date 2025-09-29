@@ -99,4 +99,94 @@ class UserController
             exit;
         }
     }
+    
+    public static function editForm(int $id)
+    {
+        $pdo = get_db();
+
+        // Fetch the user
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
+        $stmt->execute([$id]);
+        $user = $stmt->fetch();
+
+        if (!$user) {
+            $_SESSION['flash_messages'][] = [
+                'text' => "User not found.",
+                'type' => 'error'
+            ];
+            header('Location: /dashboard');
+            exit;
+        }
+
+        // Include the edit form view
+        require __DIR__ . '/../views/edit_user.php';
+    }
+
+    public static function edit(int $id)
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: /dashboard');
+            exit;
+        }
+
+        $first_name = trim($_POST['first_name']);
+        $last_name = trim($_POST['last_name']);
+        $email = trim($_POST['email']);
+        $password = $_POST['password'] ?? null; // Optional
+
+        // Basic empty field validation
+        if (!$email) {
+            header("Location: /users/edit/{$id}");
+            exit;
+        }
+
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $_SESSION['flash_messages'][] = [
+                'text' => "Invalid email format.",
+                'type' => 'error'
+            ];
+            header("Location: /users/edit/{$id}");
+            exit;
+        }
+
+        $pdo = get_db();
+
+        // Check for unique email (excluding current user)
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE email = ? AND id != ?");
+        $stmt->execute([$email, $id]);
+        if ($stmt->fetchColumn() > 0) {
+            $_SESSION['flash_messages'][] = [
+                'text' => "Email '{$email}' is already taken.",
+                'type' => 'error'
+            ];
+            header("Location: /users/edit/{$id}");
+            exit;
+        }
+
+        // Build the update query
+        if ($password) {
+            $password_hash = password_hash($password, PASSWORD_DEFAULT);
+            $stmt = $pdo->prepare("
+                UPDATE users 
+                SET first_name = ?, last_name = ?, email = ?, password_hash = ?
+                WHERE id = ?
+            ");
+            $stmt->execute([$first_name, $last_name, $email, $password_hash, $id]);
+        } else {
+            $stmt = $pdo->prepare("
+                UPDATE users 
+                SET first_name = ?, last_name = ?, email = ?
+                WHERE id = ?
+            ");
+            $stmt->execute([$first_name, $last_name, $email, $id]);
+        }
+
+        $_SESSION['flash_messages'][] = [
+            'text' => "User updated successfully.",
+            'type' => 'success'
+        ];
+        header('Location: /dashboard');
+        exit;
+    }
+
 }

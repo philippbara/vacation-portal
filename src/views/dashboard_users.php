@@ -53,6 +53,12 @@ $usersJson = json_encode($users ?? []); // passed from PHP
                 <td>{{ user.total_vacations }}</td>
                 <td>
                     <button 
+                        @click.stop="editUser(user.id)" 
+                        class="dashboard-btn"
+                    >
+                        Edit
+                    </button>
+                    <button 
                         @click.stop="deleteUser(user.id)" 
                         class="dashboard-btn danger"
                     >
@@ -93,6 +99,9 @@ createApp({
     methods: {
         goToUser(userId) {
             window.location.href = '/users/' + userId;
+        },
+        editUser(userId) {
+            window.location.href = '/users/edit/' + userId;
         },
         deleteUser(userId) {
             if (!confirm("Are you sure you want to delete this user?")) return;
