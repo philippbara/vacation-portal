@@ -1,27 +1,19 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Login - Vacation Portal</title>
-</head>
-<body>
+<?php include __DIR__ . '/components/header.php'; ?>
+
+<link rel="stylesheet" href="/css/input.css">
+
+<div class="page-container">
     <h1>Login</h1>
     
-    <?php
-    if (isset($_SESSION['flash_message'])): ?>
-        <div class="alert">
-            <?= htmlspecialchars($_SESSION['flash_message']); ?>
-        </div>
-        <?php unset($_SESSION['flash_message']); // clear after displaying ?>
-    <?php endif; ?>
+    <form class="form-container aligned" method="POST" action="/login">
+        <label for="username">Username:</label>
+        <input id="username" type="text" name="username" required>
 
-    <form method="POST" action="/login">
-        <label>Username:</label><br>
-        <input type="text" name="username" required><br><br>
-
-        <label>Password:</label><br>
-        <input type="password" name="password" required><br><br>
+        <label for="password">Password:</label>
+        <input id="password" type="password" name="password" required>
 
         <button type="submit">Login</button>
     </form>
-</body>
-</html>
+</div>
+
+<?php include __DIR__ . '/components/footer.php'; ?>

@@ -18,4 +18,4 @@ RUN composer install
 EXPOSE 8000
 
 # Run PHP built-in server
-CMD ["php", "-S", "0.0.0.0:8000", "-t", "public", "public/index.php"]
+CMD ["php", "-S", "0.0.0.0:8000", "-t", "public", "public/router.php"]

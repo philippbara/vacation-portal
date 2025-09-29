@@ -1,0 +1,99 @@
+/* public/css/table.css */
+
+/* Table styling */
+.styled-table {
+    border-collapse: collapse;
+    width: 90%;
+    min-width: 600px;
+    margin-top: 20px;
+    text-align: center;
+    font-family: Arial, sans-serif;
+}
+
+.styled-table th,
+.styled-table td {
+    border: 1px solid #ccc;
+    padding: 8px 12px;
+}
+
+.styled-table thead tr {
+    background-color: #eee;
+}
+
+/* Hover effect */
+.dashboard-page .styled-table tbody tr:hover {
+    background-color: #f0f8ff;
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+}
+
+/* Table cell alignment */
+.styled-table th,
+.styled-table td {
+    text-align: center;
+}
+
+/* Highlight pending requests */
+.styled-table td.pending {
+    color: red;
+    font-weight: bold;
+}
+
+/* Search/Create container */
+.table-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+/* Inputs */
+.table-controls input[type="text"] {
+    padding: 5px;
+    font-size: 14px;
+    width: 200px;
+}
+
+/* Buttons */
+.dashboard-btn,
+.table-controls button {
+    padding: 6px 12px;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+    margin: 2px;
+    transition: background-color 0.2s ease;
+}
+
+/* Button variants */
+.dashboard-btn.success {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.dashboard-btn.danger {
+    background-color: #f44336;
+    color: white;
+}
+
+.dashboard-btn:hover,
+.table-controls button:hover {
+    opacity: 0.85;
+}
+
+/* Page container */
+.page-container {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Utility for flex links */
+.flex-links {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 15px;
+}

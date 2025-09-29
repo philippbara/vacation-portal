@@ -12,6 +12,7 @@ class User
             SELECT 
                 u.id, 
                 u.username, 
+                u.employee_code,
                 u.first_name, 
                 u.last_name, 
                 u.email,

@@ -15,6 +15,7 @@ class UserController
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $username = trim($_POST['username']);
+            $employee_code = trim($_POST['employee_code']);
             $first_name = trim($_POST['first_name']);
             $last_name = trim($_POST['last_name']);
             $email = trim($_POST['email']);
@@ -22,14 +23,12 @@ class UserController
             $role = $_POST['role'];
 
             // Basic empty field validation
-            if (!$username || !$password || !$email ) {
-                $_SESSION['flash_message'] = "Username, email and password are required.";
+            if (!$username || !$password || !$email || !$employee_code ) {
                 header('Location: /users/create');
                 exit;
             }
             // Basic email format validation
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                $_SESSION['flash_message'] = "Invalid email format.";
                 header('Location: /users/create');
                 exit;
             }
@@ -42,7 +41,10 @@ class UserController
             $exists = $stmt->fetchColumn();
 
             if ($exists) {
-                $_SESSION['flash_message'] = "Username '{$username}' is already taken.";
+                $_SESSION['flash_messages'][] = [
+                    'text' => "Username '{$username}' is already taken.",
+                    'type' => 'error' 
+                ];
                 header('Location: /users/create');
                 exit;
             }
@@ -51,7 +53,31 @@ class UserController
             $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE email = ?");
             $stmt->execute([$email]);
             if ($stmt->fetchColumn() > 0) {
-                $_SESSION['flash_message'] = "Email '{$email}' is already in use.";
+                $_SESSION['flash_messages'][] = [
+                    'text' => "Email '{$email}' is already taken.",
+                    'type' => 'error' 
+                ];
+                header('Location: /users/create');
+                exit;
+            }
+
+            // Check if employer id already exists
+            $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE employee_code = ?");
+            $stmt->execute([$employee_code]);
+            if ($stmt->fetchColumn() > 0) {
+                $_SESSION['flash_messages'][] = [
+                    'text' => "Employer code '{$employee_code}' is already taken.",
+                    'type' => 'error' 
+                ];
+                header('Location: /users/create');
+                exit;
+            }
+
+            if (!preg_match("/^\d{7}$/", $employee_code)) {
+                $_SESSION['flash_messages'][] = [
+                    'text' => "Employer code '{$employee_code}' must be 7 digits.",
+                    'type' => 'error' 
+                ];
                 header('Location: /users/create');
                 exit;
             }
@@ -59,12 +85,15 @@ class UserController
             // Save new user
             $password_hash = password_hash($password, PASSWORD_DEFAULT);
             $stmt = $pdo->prepare("
-                INSERT INTO users (username, first_name, last_name, email, password_hash, role)
-                VALUES (?, ?, ?, ?, ?, ?)
+                INSERT INTO users (username, first_name, last_name, email, password_hash, role, employee_code)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
             ");
-            $stmt->execute([$username, $first_name, $last_name, $email, $password_hash, $role]);
+            $stmt->execute([$username, $first_name, $last_name, $email, $password_hash, $role, $employee_code]);
 
-            $_SESSION['flash_message'] = "User created successfully.";
+            $_SESSION['flash_messages'][] = [
+                'text' => "User created successfully.",
+                'type' => 'success'
+            ];
             header('Location: /dashboard');
             exit;
         }

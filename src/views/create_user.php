@@ -1,49 +1,38 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Create New User</title>
-    <style>
-        label span.required {
-            color: red;
-        }
-    </style>
-</head>
-<body>
+<?php include __DIR__ . '/components/header.php'; ?>
+
+<link rel="stylesheet" href="/css/input.css">
+
+<div class="page-container">
     <h1>Create New User</h1>
 
-    <?php if (!empty($_SESSION['flash_message'])): ?>
-        <p style="color:red"><?= htmlspecialchars($_SESSION['flash_message']) ?></p>
-        <?php unset($_SESSION['flash_message']); ?>
-    <?php endif; ?>
+    <form class="form-container aligned" method="POST" action="/users/create">
+        <label><span class="required">*</span> Username:</label>
+        <input type="text" name="username" required>
 
-    <form method="POST" action="/users/create">
-        <p>
-            <label><span class="required">*</span>Username: <input type="text" name="username" required></label>
-        </p>
-        <p>
-            <label>First Name: <input type="text" name="first_name"></label>
-        </p>
-        <p>
-            <label>Last Name: <input type="text" name="last_name"></label>
-        </p>
-        <p>
-            <label><span class="required">*</span>Email: <input type="email" name="email" required></label>
-        </p>
-        <p>
-            <label><span class="required">*</span>Password: <input type="password" name="password" required></label>
-        </p>
-        <p>
-            <label>Role:
-                <select name="role">
-                    <option value="employee">Employee</option>
-                    <option value="manager">Manager</option>
-                </select>
-            </label>
-        </p>
-        <p>
-            <button type="submit">Create User</button>
-            <a href="/dashboard"><button type="button">Cancel</button></a>
-        </p>
+        <label><span class="required">*</span> Employee Code:</label>
+        <input type="text" name="employee_code" required>
+
+        <label>First Name:</label>
+        <input type="text" name="first_name">
+
+        <label>Last Name:</label>
+        <input type="text" name="last_name">
+
+        <label><span class="required">*</span> Email:</label>
+        <input type="email" name="email" required>
+
+        <label><span class="required">*</span> Password:</label>
+        <input type="password" name="password" required>
+
+        <label>Role:</label>
+        <select name="role">
+            <option value="employee">Employee</option>
+            <option value="manager">Manager</option>
+        </select>
+
+        <button type="submit" class="dashboard-btn">Create User</button>
+        <button type="button" class="dashboard-btn danger" onclick="window.location.href='/dashboard'">Cancel</button>
     </form>
-</body>
-</html>
+</div>
+
+<?php include __DIR__ . '/components/footer.php'; ?>

@@ -1,28 +1,24 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Vacation Requests for <?= htmlspecialchars($user['username']) ?></title>
-    <style>
-        table { border-collapse: collapse; width: 90%; margin-top: 20px; }
-        th, td { border: 1px solid #ccc; padding: 8px 12px; }
-        th { background-color: #eee; }
-    </style>
-</head>
-<body>
-    <h1>Vacation Requests for <?= htmlspecialchars($user['username']) ?></h1>
+<?php
+// vacation_requests.php
 
-    <?php if (!empty($_SESSION['flash_message'])): ?>
-        <p style="color: red;"><?= htmlspecialchars($_SESSION['flash_message']) ?></p>
-        <?php unset($_SESSION['flash_message']); ?>
-    <?php endif; ?>
+$pageTitle = "Vacation Requests for " . htmlspecialchars($user['username']);
+?>
+
+<?php include __DIR__ . '/components/header.php'; ?>
+
+<link rel="stylesheet" href="/css/dashboard.css">
+
+<div id="vacation-requests-app" class="page-container">
 
     <?php if ($current_user['id'] === $user['id']): ?>
-        <p>
-            <a href="/users/<?= $user['id'] ?>/new" style="padding: 6px 12px; background: #4CAF50; color: white; text-decoration: none;">+ New Vacation Request</a>
-        </p>
+        <div class="table-controls">            
+            <a href="/users/<?= $user['id'] ?>/new">
+                <button type="button" class="dashboard-btn">+ New Vacation Request</button>
+            </a>
+        </div>
     <?php endif; ?>
 
-    <table>
+    <table class="styled-table">
         <thead>
             <tr>
                 <th>Start Date</th>
@@ -35,66 +31,92 @@
             </tr>
         </thead>
         <tbody>
-            <?php foreach ($requests as $r): ?>
-                <tr>
-                    <td><?= htmlspecialchars($r['start_date']) ?></td>
-                    <td><?= htmlspecialchars($r['end_date']) ?></td>
-                    <td><?= htmlspecialchars($r['reason']) ?></td>
-                    <td>
-                        <?php
-                            $submitted = new DateTime($r['created_at']);
-                            echo $submitted->format('Y-m-d');
-                        ?>
-                    </td>
-                    <td>
-                        <?php
-                        $start = new DateTime($r['start_date']);
-                        $end = new DateTime($r['end_date']);
-                        $interval = new DateInterval('P1D');
-                        $period = new DatePeriod($start, $interval, $end->modify('+1 day'));
-                        $weekdays = 0;
-                        foreach ($period as $dt) {
-                            if ($dt->format('N') < 6) { // 1-5 are Monday-Friday
-                                $weekdays++;
-                            }
-                        }
-                        echo $weekdays;
-                        ?>
-                    </td>
-                    <td><?= htmlspecialchars(ucfirst($r['status'])) ?></td>
-                    <td>
-                        <?php if ($r['status'] === 'pending'): ?>
-                            <?php if ($current_user['role'] === 'employee' && $current_user['id'] === $user['id']): ?>
-                                <form method="post" action="/users/<?= $user['id'] ?>/<?= $r['id'] ?>/delete" style="display:inline;">
-                                    <button type="submit" onclick="return confirm('Are you sure you want to delete this pending request?');">
-                                        Delete
-                                    </button>
-                                </form>
-                            <?php elseif (in_array($current_user['role'], ['manager', 'admin'])): ?>
-                                <form method="post" action="/users/<?= $user['id'] ?>/<?= $r['id'] ?>/approve" style="display:inline;">
-                                    <button type="submit" onclick="return confirm('Are you sure you want to approve this vacation request?');">Approve</button>
-                                </form>
-                                <form method="post" action="/users/<?= $user['id'] ?>/<?= $r['id'] ?>/reject" style="display:inline;">
-                                    <button type="submit" onclick="return confirm('Are you sure you want to reject this vacation request?');">Reject</button>
-                                </form>
-                            <?php endif; ?>
-                        <?php endif; ?>
-                    </td>
-                </tr>
-            <?php endforeach; ?>
+            <tr v-for="r in requests" :key="r.id">
+                <td>{{ r.start_date }}</td>
+                <td>{{ r.end_date }}</td>
+                <td>{{ r.reason }}</td>
+                <td>{{ formatDate(r.created_at) }}</td>
+                <td>{{ countWeekdays(r.start_date, r.end_date) }}</td>
+                <td>{{ capitalize(r.status) }}</td>
+                <td>
+                    <!-- Employee can delete own pending requests -->
+                    <template v-if="r.status === 'pending'">
+                        <button 
+                            v-if="currentUser.role === 'employee' && currentUser.id === user.id"
+                            @click="handleRequest(r.id, 'delete', 'Are you sure?')"
+                            class="dashboard-btn danger"
+                        >
+                            Delete
+                        </button>
+
+                        <!-- Manager/Admin can approve/reject -->
+                        <template v-else-if="['manager','admin'].includes(currentUser.role)">
+                            <button @click="handleRequest(r.id, 'approve', 'Are you sure?')" class="dashboard-btn success">Approve</button>
+                            <button @click="handleRequest(r.id, 'reject', 'Are you sure?')" class="dashboard-btn danger">Reject</button>
+                        </template>
+                    </template>
+                </td>
+            </tr>
         </tbody>
     </table>
+
     <?php if (in_array($current_user['role'], ['manager', 'admin'])): ?>
-        <p>
+        <div class="flex-links">
             <a href="/dashboard">
-                <button type="button">Back to Dashboard</button>
+                <button class="dashboard-btn">Back to Dashboard</button>
             </a>
-        </p>
+        </div>
     <?php endif; ?>
-    <p>
-        <a href="/logout">
-            <button type="button">Logout</button>
-        </a>
-    </p>
-</body>
-</html>
+</div>
+
+<?php include __DIR__ . '/components/footer.php'; ?>
+
+<!-- Vue 3 -->
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script>
+const { createApp } = Vue;
+
+createApp({
+    data() {
+        return {
+            user: <?= json_encode($user) ?>,
+            currentUser: <?= json_encode($current_user) ?>,
+            requests: <?= json_encode($requests) ?>,
+        };
+    },
+    methods: {
+        formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return date.toISOString().split('T')[0];
+        },
+        capitalize(str) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        },
+        countWeekdays(startDate, endDate) {
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            let count = 0;
+            for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+                const day = d.getDay();
+                if (day >= 1 && day <= 5) count++;
+            }
+            return count;
+        },
+        handleRequest(requestId, action, message = null) {
+            if (message && !confirm(message)) return;
+
+            fetch(`/users/${this.user.id}/${requestId}/${action}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: ''
+            })
+            .then(res => {
+                if (!res.ok) return alert(`Failed to ${action} request`);
+                location.reload(); // always reload, no need for newStatus
+            })
+            .catch(() => alert(`Failed to ${action} request`));
+        }
+    }
+}).mount('#vacation-requests-app');
+
+</script>

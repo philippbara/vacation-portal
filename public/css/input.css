@@ -1,0 +1,101 @@
+/* public/css/input.css */
+
+/* Page container */
+.page-container {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: Arial, sans-serif;
+}
+
+/* Form styling */
+.form-container {
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+/* Labels */
+.form-container label {
+    font-weight: bold;
+}
+
+/* Inputs */
+.form-container input{
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* Inputs */
+.form-container select{
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* Buttons */
+.form-container button {
+    padding: 6px 12px;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+    background-color: #4CAF50;
+    color: white;
+    transition: background-color 0.2s ease;
+}
+
+.form-container button:hover {
+    opacity: 0.85;
+}
+
+/* Flash message */
+.alert {
+    color: red;
+    font-weight: bold;
+    margin-bottom: 12px;
+}
+
+/* Aligned form */
+.form-container.aligned {
+    display: grid;
+    grid-template-columns: 120px 1fr; /* labels fixed width, inputs take remaining space */
+    gap: 10px 15px; /* row gap 10px, column gap 15px */
+    align-items: center;
+}
+
+/* Make buttons span both columns */
+.form-container.aligned button,
+.form-container.aligned a {
+    grid-column: 1 / -1;
+}
+
+/* Buttons */
+.dashboard-btn {
+    padding: 6px 12px;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+    background-color: #4CAF50;
+    color: white;
+    transition: background-color 0.2s ease;
+}
+
+.dashboard-btn:hover {
+    opacity: 0.85;
+}
+
+/* Danger variant (red) */
+.dashboard-btn.danger {
+    background-color: #f44336;
+    color: white;
+}
+
+

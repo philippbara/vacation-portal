@@ -1,60 +1,96 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Dashboard - Employees</title>
-    <style>
-        table { border-collapse: collapse; width: 90%; margin-top: 20px; }
-        th, td { border: 1px solid #ccc; padding: 8px 12px; }
-        th { background-color: #eee; }
-        a { text-decoration: none; color: #00f; }
-        a:hover { text-decoration: underline; }
-    </style>
-</head>
-<body>
-    <h1>Dashboard - Employees</h1>
-    <p>Welcome, <?= htmlspecialchars($username) ?>! Role: <strong><?= htmlspecialchars($role) ?></strong></p>
+<?php
+$pageTitle = "Dashboard";
+$user = $_SESSION['user'] ?? ['username' => 'Guest'];
+$usersJson = json_encode($users ?? []); // passed from PHP
+?>
 
-    <?php if (in_array($role, ['manager', 'admin'])): ?>
-        <p>
-            <a href="/users/create" style="padding: 6px 12px; background: #4CAF50; color: white; text-decoration: none;">➕ Create New User</a>
-        </p>
-    <?php endif; ?>
+<?php include __DIR__ . '/components/header.php'; ?>
 
-    <table>
+<link rel="stylesheet" href="/css/dashboard.css">
+
+<div id="dashboard-app" class="page-container dashboard-page">
+    
+    <h1>Employees of <?= htmlspecialchars($user['username']) ?></h1>
+
+    <div class="table-controls">
+        <input type="text" v-model="search" placeholder="Search users...">
+        <a href="/users/create">
+            <button>+ Create User</button>
+        </a>
+    </div>
+    
+    <table class="styled-table">
         <thead>
             <tr>
-                <th></th> <!-- Attention icon -->
+                <th></th>
                 <th>Username</th>
+                <th>Employee ID</th>
                 <th>Name</th>
                 <th>Email</th>
                 <th>Total Vacation Requests</th>
             </tr>
         </thead>
         <tbody>
-            <?php foreach ($users as $u): ?>
-                <?php 
-                    // Determine if user has any pending requests
-                    $pending_count = $u['pending_requests'] ?? 0; 
-                ?>
-                <tr onclick="window.location='/users/<?= $u['id'] ?>'" style="cursor:pointer;">
-                    <td style="text-align:center;">
-                        <?php if ($pending_count > 0): ?>
-                            ⚠️ <?= $pending_count ?>
-                        <?php endif; ?>
-                    </td>
-                    <td><?= htmlspecialchars($u['username']) ?></td>
-                    <td><?= htmlspecialchars($u['first_name'] . ' ' . $u['last_name']) ?></td>
-                    <td><?= htmlspecialchars($u['email']) ?></td>
-                    <td><?= htmlspecialchars($u['total_vacations']) ?></td>
-                </tr>
-            <?php endforeach; ?>
+            <tr 
+                v-for="user in filteredUsers" 
+                :key="user.id" 
+                @click="goToUser(user.id)" 
+                style="cursor:pointer;"
+            >
+                <td 
+                    v-if="user.pending_requests > 0" 
+                    class="pending"
+                    :title="user.pending_requests + ' pending vacation request' + (user.pending_requests > 1 ? 's' : '')"
+                >
+                    ⚠️ {{ user.pending_requests }}
+                </td>
+                <td v-else></td>
+                <td>{{ user.username }}</td>
+                <td>{{ user.employee_code }}</td>
+                <td>{{ user.first_name }} {{ user.last_name }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.total_vacations }}</td>
+            </tr>
         </tbody>
     </table>
+</div>
 
-    <p>
-        <a href="/logout">
-            <button type="button">Logout</button>
-        </a>
-    </p>
-</body>
-</html>
+<?php include __DIR__ . '/components/footer.php'; ?>
+
+<!-- Vue 3 -->
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script>
+const { createApp } = Vue;
+const initialUsers = <?= $usersJson ?>;
+
+createApp({
+    data() {
+        return {
+            search: '',
+            users: initialUsers || []
+        };
+    },
+    computed: {
+        filteredUsers() {
+            if (!this.search) return this.users;
+            const term = this.search.toLowerCase();
+            return this.users.filter(u =>
+                u.username.toLowerCase().includes(term) ||
+                u.first_name.toLowerCase().includes(term) ||
+                u.last_name.toLowerCase().includes(term)
+            );
+        }
+    },
+    methods: {
+        goToUser(userId) {
+            window.location.href = '/users/' + userId;
+        }
+    }
+}).mount('#dashboard-app');
+</script>
+
+<style>
+.styled-table tbody tr:hover {
+    background-color: #f0f8ff;
+}
+</style>

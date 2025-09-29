@@ -33,7 +33,10 @@ class AuthController
                 }
                 exit();
             } else {
-                $_SESSION['flash_message'] = "Invalid username or password.";
+                $_SESSION['flash_messages'][] = [
+                    'text' => "Invalid username or password.",
+                    'type' => 'error' 
+                ];
                 header('Location: /login');
                 exit();
             }
@@ -50,7 +53,10 @@ class AuthController
 
         // Redirect with message
         session_start(); // restart to set flash after destroy
-        $_SESSION['flash_message'] = "👋 You have been logged out.";
+        $_SESSION['flash_messages'][] = [
+            'text' => "You have been logged out.",
+            'type' => 'success' 
+        ];
         header('Location: /login');
         exit;
     }

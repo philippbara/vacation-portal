@@ -1,32 +1,27 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>New Vacation Request - <?= htmlspecialchars($user['username']) ?></title>
-</head>
-<body>
+<?php include __DIR__ . '/components/header.php'; ?>
+
+<link rel="stylesheet" href="/css/input.css">
+
+<div class="page-container">
     <h1>New Vacation Request for <?= htmlspecialchars($user['username']) ?></h1>
 
-    <?php if (!empty($_SESSION['flash_message'])): ?>
-        <p style="color: red;"><?= htmlspecialchars($_SESSION['flash_message']) ?></p>
-        <?php unset($_SESSION['flash_message']); ?>
-    <?php endif; ?>
+    <form class="form-container aligned" method="post" action="/users/<?= $user['id'] ?>/new">
+        <label>Start Date:</label>
+        <input type="date" name="start_date" required>
 
-    <form method="post" action="/users/<?= $user['id'] ?>/new">
-        <p>
-            <label>Start Date: <input type="date" name="start_date" required></label>
-        </p>
-        <p>
-            <label>End Date: <input type="date" name="end_date" required></label>
-        </p>
-        <p>
-            <label>Reason:<br>
-                <textarea name="reason" rows="3" cols="30"></textarea>
-            </label>
-        </p>
-        <p>
-            <button type="submit" onclick="return confirm('Are you sure you want to create a new vacation request?');">Submit Request</button>
-            <a href="/users/<?= $user['id'] ?>">Cancel</a>
-        </p>
+        <label>End Date:</label>
+        <input type="date" name="end_date" required>
+
+        <label>Reason:</label>
+        <textarea name="reason" rows="3"></textarea>
+
+        <button type="submit" class="dashboard-btn" onclick="return confirm('Are you sure you want to create a new vacation request?');">
+            Submit Request
+        </button>
+        <button type="button" class="dashboard-btn danger" onclick="window.location.href='/users/<?= $user['id'] ?>'">
+            Cancel
+        </button>
     </form>
-</body>
-</html>
+</div>
+
+<?php include __DIR__ . '/components/footer.php'; ?>
